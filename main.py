@@ -1,13 +1,15 @@
 from fastapi import FastAPI, Header, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
-# Updated request body to match Endpoint Tester
 class AudioRequest(BaseModel):
     language: str
-    audio_format: str
-    audio_base64: str
+    audio_format: str = Field(..., alias="audioFormat")
+    audio_base64: str = Field(..., alias="audioBase64")
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 @app.get("/")
@@ -24,9 +26,7 @@ def detect(
     if x_api_key != "my-secret-key":
         raise HTTPException(status_code=401, detail="Invalid API Key")
 
-    # Here you could process the audio_base64 if needed
-    # For tester, we just return a dummy response
-
+    # Here you could process audio_base64 if needed
     return {
         "success": True,
         "message": "Audio processed",
